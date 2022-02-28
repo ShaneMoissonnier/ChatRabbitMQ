@@ -1,0 +1,5 @@
+# IntelliJ files
+.idea/
+
+# Maven build directory
+target/
