@@ -1,4 +1,6 @@
-package chatRabbitMQ.server;
+package chatRabbitMQ.config;
+
+import chatRabbitMQ.common.Client;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -6,27 +8,35 @@ import java.util.concurrent.TimeoutException;
 /**
  * This class's purpose is to clean up the Rabbit-MQ Server by removing the declared exchanges.
  * <p>
- * The class {@link ServerConfig} is used to configure the server.
+ * The class {@link ConfigSetup} is used to configure the server.
  */
-class ServerClean extends ServerAbstract {
+class ConfigClean extends Client {
+    public ConfigClean() throws IOException, TimeoutException {
+        super();
+        this.run();
+    }
+
     @Override
-    protected void configure() throws IOException {
+    protected void mainBody() throws IOException {
         logger.info("Deleting exchanges...");
         this.channel.exchangeDelete(EXCHANGE_MESSAGES_NAME);
         logger.info("   - '" + EXCHANGE_MESSAGES_NAME + "' exchange deleted");
-        this.channel.exchangeDelete(EXCHANGE_STATUS_NAME);
-        logger.info("   - '" + EXCHANGE_STATUS_NAME + "' exchange deleted");
+        this.channel.exchangeDelete(EXCHANGE_SYSTEM_NAME);
+        logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange deleted");
         logger.info("Exchanges deletion done");
     }
 
-    private ServerClean() throws IOException, TimeoutException {
-        super();
+    @Override
+    protected void beforeConnect() {
         logger.info("Starting server cleaning...");
-        this.run();
+    }
+
+    @Override
+    protected void afterDisconnect() {
         logger.info("Successfully cleaned up RabbitMQ-Server !");
     }
 
     public static void main(String[] args) throws IOException, TimeoutException {
-        new ServerClean();
+        new ConfigClean();
     }
 }
