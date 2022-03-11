@@ -1,5 +1,10 @@
 package chatRabbitMQ.chat;
 
+/**
+ * A chat message is a text message sent by a user in the chat.
+ *
+ * @see Message
+ */
 public class ChatMessage extends Message {
     private final String message;
 

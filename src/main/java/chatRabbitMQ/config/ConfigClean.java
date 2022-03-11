@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * This class's purpose is to clean up the Rabbit-MQ Server by removing the declared exchanges.
+ * This class's purpose is to clean up the RabbitMQ Server by removing the declared exchanges.
  * <p>
  * The class {@link ConfigSetup} is used to configure the server.
  */

@@ -1,5 +1,11 @@
 package chatRabbitMQ.chat;
 
+/**
+ * A system message is anything that is not a {@link ChatMessage}, i.e. a message to notify that someone joined or left
+ * the chat.
+ *
+ * @see Message
+ */
 public class SystemMessage extends Message {
     private final SystemMessageType type;
 

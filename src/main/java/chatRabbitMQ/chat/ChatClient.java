@@ -8,6 +8,9 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * The main client. It represents a User using the chat to send messages
+ */
 public class ChatClient extends Client {
     private final String username;
 
@@ -28,7 +31,8 @@ public class ChatClient extends Client {
                 case LOGOUT -> logger.info(message.getUsername() + " left the chat");
             }
         };
-        channel.basicConsume(systemQueueName, true, systemCallback, consumerTag -> {});
+        channel.basicConsume(systemQueueName, true, systemCallback, consumerTag -> {
+        });
 
         /* Chat message queue */
         String chatQueueName = channel.queueDeclare().getQueue();
@@ -37,7 +41,8 @@ public class ChatClient extends Client {
             ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
             System.out.println(message.getUsername() + " : " + message.getMessage());
         };
-        channel.basicConsume(chatQueueName, true, chatMessageCallback, consumerTag -> {});
+        channel.basicConsume(chatQueueName, true, chatMessageCallback, consumerTag -> {
+        });
     }
 
     private void sendSystemMessage(SystemMessageType type) throws IOException {

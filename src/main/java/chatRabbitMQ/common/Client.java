@@ -23,6 +23,9 @@ public abstract class Client {
         logger = Logger.getLogger(this.getClass().getName());
     }
 
+    /**
+     * Connects to the RabbitMQ Server
+     */
     private void connect() throws IOException, TimeoutException {
         logger.info("Connecting to RabbitMQ-Server...");
         ConnectionFactory factory = new ConnectionFactory();
@@ -33,6 +36,9 @@ public abstract class Client {
         logger.info("Connection successful");
     }
 
+    /**
+     * Disconnects from the RabbitMQ Server
+     */
     private void disconnect() throws IOException, TimeoutException {
         logger.info("Disconnecting from RabbitMQ-Server...");
         this.channel.close();
@@ -40,14 +46,30 @@ public abstract class Client {
         logger.info("Disconnection successful");
     }
 
+    /**
+     * This method exists to be overridden. It is used to allow the client to do something before connecting to the
+     * server.
+     */
     protected void beforeConnect() {
     }
 
+    /**
+     * The actual body of the client.
+     * <p>
+     * This is where the input loop for the main chat client is, for example.
+     */
     protected abstract void mainBody() throws IOException;
 
+    /**
+     * This method exists to be overridden. It is used to allow the client to do something after disconnecting to the
+     * server.
+     */
     protected void afterDisconnect() {
     }
 
+    /**
+     * The client's main method. It manages the flow of the client's execution
+     */
     protected void run() throws IOException, TimeoutException {
         this.setupLogger();
         this.beforeConnect();
