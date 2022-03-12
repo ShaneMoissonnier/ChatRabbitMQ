@@ -1,8 +1,8 @@
 package chatRabbitMQ.common;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import chatRabbitMQ.chat.SystemMessage;
+import chatRabbitMQ.chat.SystemMessageType;
+import com.rabbitmq.client.*;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -17,6 +17,8 @@ public abstract class Client {
 
     protected Connection connection = null;
     protected Channel channel = null;
+
+    private String clientName;
 
     private void setupLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
@@ -46,6 +48,24 @@ public abstract class Client {
         logger.info("Disconnection successful");
     }
 
+    private void subscribeToQueues() throws IOException {
+        /* System queue */
+        String systemQueueName = channel.queueDeclare().getQueue();
+        channel.queueBind(systemQueueName, EXCHANGE_SYSTEM_NAME, "");
+        channel.basicConsume(systemQueueName, true, this::systemCallbackInit, consumerTag -> {
+        });
+
+        /* Chat message queue */
+        String chatQueueName = channel.queueDeclare().getQueue();
+        channel.queueBind(chatQueueName, EXCHANGE_MESSAGES_NAME, "");
+        channel.basicConsume(chatQueueName, true, this::messageCallbackInit, consumerTag -> {
+        });
+    }
+
+    protected abstract void systemCallbackInit(String s, Delivery delivery);
+
+    protected abstract void messageCallbackInit(String s, Delivery delivery);
+
     /**
      * This method exists to be overridden. It is used to allow the client to do something before connecting to the
      * server.
@@ -70,15 +90,37 @@ public abstract class Client {
     /**
      * The client's main method. It manages the flow of the client's execution
      */
-    protected void run() throws IOException, TimeoutException {
+    protected void run(boolean client) throws IOException, TimeoutException {
         this.setupLogger();
         this.beforeConnect();
         this.connect();
+        if (client)
+            this.subscribeToQueues();
         this.mainBody();
         this.disconnect();
         this.afterDisconnect();
     }
 
-    public Client() {
+    public void sendSystemMessage(SystemMessageType type) throws IOException {
+        SystemMessage message = new SystemMessage(type, this.clientName);
+        channel.basicPublish(EXCHANGE_SYSTEM_NAME, "", null, message.toBytes());
     }
+
+    public void joinChat() throws IOException {
+        this.sendSystemMessage(SystemMessageType.LOGIN);
+    }
+
+    public void leaveChat() throws IOException {
+        this.sendSystemMessage(SystemMessageType.LOGOUT);
+    }
+
+    public String getClientName() {
+        return this.clientName;
+    }
+
+    public void setClientName(String name) {
+        this.clientName = name;
+    }
+
+    public Client() {}
 }

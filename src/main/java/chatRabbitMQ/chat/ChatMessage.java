@@ -1,5 +1,7 @@
 package chatRabbitMQ.chat;
 
+import chatRabbitMQ.common.Message;
+
 /**
  * A chat message is a text message sent by a user in the chat.
  *

@@ -2,6 +2,7 @@ package chatRabbitMQ.config;
 
 import chatRabbitMQ.common.Client;
 import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Delivery;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 class ConfigSetup extends Client {
     private ConfigSetup() throws IOException, TimeoutException {
         super();
-        this.run();
+        this.run(false);
     }
 
     @Override
@@ -25,6 +26,16 @@ class ConfigSetup extends Client {
         this.channel.exchangeDeclare(EXCHANGE_SYSTEM_NAME, BuiltinExchangeType.FANOUT);
         logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange declared");
         logger.info("Exchanges declaration done");
+    }
+
+    @Override
+    protected void systemCallbackInit(String s, Delivery delivery) {
+
+    }
+
+    @Override
+    protected void messageCallbackInit(String s, Delivery delivery) {
+
     }
 
     @Override

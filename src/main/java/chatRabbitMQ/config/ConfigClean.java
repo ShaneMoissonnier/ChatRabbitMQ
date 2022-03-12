@@ -1,6 +1,7 @@
 package chatRabbitMQ.config;
 
 import chatRabbitMQ.common.Client;
+import com.rabbitmq.client.Delivery;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 class ConfigClean extends Client {
     public ConfigClean() throws IOException, TimeoutException {
         super();
-        this.run();
+        this.run(false);
     }
 
     @Override
@@ -24,6 +25,16 @@ class ConfigClean extends Client {
         this.channel.exchangeDelete(EXCHANGE_SYSTEM_NAME);
         logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange deleted");
         logger.info("Exchanges deletion done");
+    }
+
+    @Override
+    protected void systemCallbackInit(String s, Delivery delivery) {
+
+    }
+
+    @Override
+    protected void messageCallbackInit(String s, Delivery delivery) {
+
     }
 
     @Override

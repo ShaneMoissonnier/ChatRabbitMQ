@@ -1,6 +1,10 @@
-package chatRabbitMQ.chat;
+package chatRabbitMQ.common;
 
 import java.io.*;
+
+import chatRabbitMQ.chat.ChatMessage;
+import chatRabbitMQ.chat.SystemMessage;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  * This class is used by clients to communicate with one another.
@@ -31,15 +35,7 @@ public abstract class Message implements Serializable {
      * @return A byte array representing the message.
      */
     public byte[] toBytes() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(bos);
-            out.writeObject(this);
-            return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SerializationUtils.serialize(this);
     }
 
     /**
@@ -49,13 +45,6 @@ public abstract class Message implements Serializable {
      * @return The deserialized message
      */
     protected static Message fromBytes(byte[] bytes) {
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream oin = new ObjectInputStream(bis);
-            return (Message) oin.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SerializationUtils.deserialize(bytes);
     }
 }
