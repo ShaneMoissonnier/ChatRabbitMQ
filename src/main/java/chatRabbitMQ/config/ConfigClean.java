@@ -24,6 +24,8 @@ class ConfigClean extends Client {
         logger.info("   - '" + EXCHANGE_MESSAGES_NAME + "' exchange deleted");
         this.channel.exchangeDelete(EXCHANGE_SYSTEM_NAME);
         logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange deleted");
+        this.channel.exchangeDelete(EXCHANGE_NOTIFY_PRESENCE);
+        logger.info("   - '" + EXCHANGE_NOTIFY_PRESENCE + "' exchange deleted");
         logger.info("Exchanges deletion done");
     }
 

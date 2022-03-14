@@ -18,6 +18,7 @@ public class ClientFrame extends JFrame {
         instance = this;
 
         //TODO: Add Flatlaf initialization
+        FlatAtomOneDarkContrastIJTheme.setup();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(1256, 860));

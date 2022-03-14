@@ -13,13 +13,13 @@ import org.apache.commons.lang3.SerializationUtils;
  * - {@link SystemMessage} used for exchanging system information (when someone joins or leave the chat) <br>
  * - {@link ChatMessage} used for exchanging text messages sent by the users
  */
-public abstract class Message implements Serializable {
+public class Message implements Serializable {
     /**
      * The name of the client sending the message
      */
     private final String username;
 
-    protected Message(String username) {
+    public Message(String username) {
         this.username = username;
     }
 

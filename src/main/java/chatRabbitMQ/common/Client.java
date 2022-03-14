@@ -5,6 +5,8 @@ import chatRabbitMQ.chat.SystemMessageType;
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
@@ -12,6 +14,7 @@ public abstract class Client {
     protected static final String HOST = "localhost";
     protected static final String EXCHANGE_MESSAGES_NAME = "messages";
     protected static final String EXCHANGE_SYSTEM_NAME = "system";
+    protected static final String EXCHANGE_NOTIFY_PRESENCE = "presence_notify";
 
     protected Logger logger = null;
 
@@ -19,6 +22,7 @@ public abstract class Client {
     protected Channel channel = null;
 
     private String clientName;
+    protected final Set<String> clients;
 
     private void setupLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
@@ -60,11 +64,23 @@ public abstract class Client {
         channel.queueBind(chatQueueName, EXCHANGE_MESSAGES_NAME, "");
         channel.basicConsume(chatQueueName, true, this::messageCallbackInit, consumerTag -> {
         });
+
+        /* Presence notification queue */
+        String notifyQueueName = channel.queueDeclare().getQueue();
+        channel.queueBind(notifyQueueName, EXCHANGE_NOTIFY_PRESENCE, this.getClientName());
+        channel.basicConsume(notifyQueueName, true, this::notifyPresenceCallbackInit, consumerTag -> {
+        });
     }
 
     protected abstract void systemCallbackInit(String s, Delivery delivery);
 
     protected abstract void messageCallbackInit(String s, Delivery delivery);
+
+    protected void notifyPresenceCallbackInit(String ignored, Delivery delivery) {
+        Message m = Message.fromBytes(delivery.getBody());
+        this.clients.add(m.getUsername());
+        logger.info("clients online : " + this.clients);
+    }
 
     /**
      * This method exists to be overridden. It is used to allow the client to do something before connecting to the
@@ -106,12 +122,23 @@ public abstract class Client {
         channel.basicPublish(EXCHANGE_SYSTEM_NAME, "", null, message.toBytes());
     }
 
+    public void sendPresenceNotification(String target) {
+        Message message = new Message(this.getClientName());
+        try {
+            channel.basicPublish(EXCHANGE_NOTIFY_PRESENCE, target, null, message.toBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void joinChat() throws IOException {
+        this.clients.add(this.clientName);
         this.sendSystemMessage(SystemMessageType.LOGIN);
     }
 
     public void leaveChat() throws IOException {
         this.sendSystemMessage(SystemMessageType.LOGOUT);
+        this.clients.clear();
     }
 
     public String getClientName() {
@@ -122,5 +149,7 @@ public abstract class Client {
         this.clientName = name;
     }
 
-    public Client() {}
+    public Client() {
+        clients = new HashSet<>();
+    }
 }

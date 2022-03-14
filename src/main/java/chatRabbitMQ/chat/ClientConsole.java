@@ -23,15 +23,24 @@ public class ClientConsole extends Client {
     protected void systemCallbackInit(String consumerTag, Delivery delivery) {
         SystemMessage message = SystemMessage.fromBytes(delivery.getBody());
         switch (message.getType()) {
-            case LOGIN -> logger.info(message.getUsername() + " joined the chat");
-            case LOGOUT -> logger.info(message.getUsername() + " left the chat");
+            case LOGIN -> {
+                logger.info(message.getUsername() + " joined the chat");
+                this.clients.add(message.getUsername());
+                this.sendPresenceNotification(message.getUsername());
+            }
+            case LOGOUT -> {
+                logger.info(message.getUsername() + " left the chat");
+                this.clients.remove(message.getUsername());
+            }
         }
+        logger.info("clients online : " + this.clients);
     }
 
     @Override
     protected void messageCallbackInit(String consumerTag, Delivery delivery) {
         ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
         System.out.println(message.getUsername() + " : " + message.getMessage());
+        logger.info("clients online : " + this.clients);
     }
 
     @Override

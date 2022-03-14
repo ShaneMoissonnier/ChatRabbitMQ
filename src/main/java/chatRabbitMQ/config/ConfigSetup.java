@@ -25,6 +25,8 @@ class ConfigSetup extends Client {
         logger.info("   - '" + EXCHANGE_MESSAGES_NAME + "' exchange declared");
         this.channel.exchangeDeclare(EXCHANGE_SYSTEM_NAME, BuiltinExchangeType.FANOUT);
         logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange declared");
+        this.channel.exchangeDeclare(EXCHANGE_NOTIFY_PRESENCE, BuiltinExchangeType.DIRECT);
+        logger.info("   - '" + EXCHANGE_NOTIFY_PRESENCE + "' exchange declared");
         logger.info("Exchanges declaration done");
     }
 
