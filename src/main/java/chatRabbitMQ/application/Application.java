@@ -1,6 +1,6 @@
-package chatRabbitMQ.chat;
+package chatRabbitMQ.application;
 
-import chatRabbitMQ.gui.ClientFrame;
+import chatRabbitMQ.application.gui.ClientFrame;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -13,11 +13,7 @@ public class Application {
             return;
         }
 
-        boolean useGUI = true;
-
-        if (args.length == 2 && args[1].equals("-console")) {
-            useGUI = false;
-        }
+        boolean useGUI = args.length != 2 || !args[1].equals("-console");
 
         if (useGUI) {
             ClientGUI client = new ClientGUI();

@@ -1,9 +1,9 @@
-package chatRabbitMQ.gui;
+package chatRabbitMQ.application.gui;
 
-import chatRabbitMQ.chat.ClientGUI;
-import chatRabbitMQ.gui.widgets.ContentPanel;
-import chatRabbitMQ.gui.widgets.MenuBar;
-import chatRabbitMQ.gui.widgets.SideBar;
+import chatRabbitMQ.application.ClientGUI;
+import chatRabbitMQ.application.gui.widgets.ContentPanel;
+import chatRabbitMQ.application.gui.widgets.MenuBar;
+import chatRabbitMQ.application.gui.widgets.SideBar;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkContrastIJTheme;
 
 import javax.swing.*;

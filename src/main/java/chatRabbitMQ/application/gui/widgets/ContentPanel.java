@@ -1,7 +1,7 @@
-package chatRabbitMQ.gui.widgets;
+package chatRabbitMQ.application.gui.widgets;
 
-import chatRabbitMQ.common.Message;
-import chatRabbitMQ.chat.ClientGUI;
+import chatRabbitMQ.messages.Message;
+import chatRabbitMQ.application.ClientGUI;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

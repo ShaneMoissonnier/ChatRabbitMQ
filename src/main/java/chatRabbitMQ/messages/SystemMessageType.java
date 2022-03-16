@@ -1,4 +1,4 @@
-package chatRabbitMQ.chat;
+package chatRabbitMQ.messages;
 
 public enum SystemMessageType {
     LOGIN,

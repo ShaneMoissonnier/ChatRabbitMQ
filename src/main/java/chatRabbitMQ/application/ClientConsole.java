@@ -1,6 +1,7 @@
-package chatRabbitMQ.chat;
+package chatRabbitMQ.application;
 
-import chatRabbitMQ.common.Client;
+import chatRabbitMQ.messages.ChatMessage;
+import chatRabbitMQ.messages.SystemMessage;
 import com.rabbitmq.client.Delivery;
 
 import java.io.IOException;
@@ -11,12 +12,11 @@ import java.util.concurrent.TimeoutException;
 /**
  * The main client. It represents a User using the chat to send messages
  */
-public class ClientConsole extends Client {
-
+public class ClientConsole extends ChatClientAbstract {
     public ClientConsole(String username) throws IOException, TimeoutException {
         super();
         this.setClientName(username);
-        this.run(true);
+        this.run();
     }
 
     @Override
@@ -24,23 +24,27 @@ public class ClientConsole extends Client {
         SystemMessage message = SystemMessage.fromBytes(delivery.getBody());
         switch (message.getType()) {
             case LOGIN -> {
-                logger.info(message.getUsername() + " joined the chat");
+                if (!message.getUsername().equals(this.getClientName())) {
+                    logger.info(message.getUsername() + " joined the chat");
+                    logger.info("clients online : " + this.clients);
+                }
                 this.clients.add(message.getUsername());
                 this.sendPresenceNotification(message.getUsername());
             }
             case LOGOUT -> {
-                logger.info(message.getUsername() + " left the chat");
+                if (!message.getUsername().equals(this.getClientName())) {
+                    logger.info(message.getUsername() + " left the chat");
+                    logger.info("clients online : " + this.clients);
+                }
                 this.clients.remove(message.getUsername());
             }
         }
-        logger.info("clients online : " + this.clients);
     }
 
     @Override
     protected void messageCallbackInit(String consumerTag, Delivery delivery) {
         ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
         System.out.println(message.getUsername() + " : " + message.getMessage());
-        logger.info("clients online : " + this.clients);
     }
 
     @Override

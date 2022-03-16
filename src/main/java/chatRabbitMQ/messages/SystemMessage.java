@@ -1,6 +1,4 @@
-package chatRabbitMQ.chat;
-
-import chatRabbitMQ.common.Message;
+package chatRabbitMQ.messages;
 
 /**
  * A system message is anything that is not a {@link ChatMessage}, i.e. a message to notify that someone joined or left

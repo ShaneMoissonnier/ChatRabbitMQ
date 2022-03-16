@@ -1,6 +1,6 @@
-package chatRabbitMQ.gui.widgets;
+package chatRabbitMQ.application.gui.widgets;
 
-import chatRabbitMQ.gui.ClientFrame;
+import chatRabbitMQ.application.gui.ClientFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

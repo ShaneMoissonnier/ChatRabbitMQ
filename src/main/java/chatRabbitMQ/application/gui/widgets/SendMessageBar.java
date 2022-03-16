@@ -1,6 +1,6 @@
-package chatRabbitMQ.gui.widgets;
+package chatRabbitMQ.application.gui.widgets;
 
-import chatRabbitMQ.chat.ClientGUI;
+import chatRabbitMQ.application.ClientGUI;
 
 import javax.swing.*;
 import java.awt.*;

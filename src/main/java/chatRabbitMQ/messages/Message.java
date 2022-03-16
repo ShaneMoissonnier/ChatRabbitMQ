@@ -1,9 +1,7 @@
-package chatRabbitMQ.common;
+package chatRabbitMQ.messages;
 
 import java.io.*;
 
-import chatRabbitMQ.chat.ChatMessage;
-import chatRabbitMQ.chat.SystemMessage;
 import org.apache.commons.lang3.SerializationUtils;
 
 /**
@@ -44,7 +42,7 @@ public class Message implements Serializable {
      * @param bytes The bytes to convert
      * @return The deserialized message
      */
-    protected static Message fromBytes(byte[] bytes) {
+    public static Message fromBytes(byte[] bytes) {
         return SerializationUtils.deserialize(bytes);
     }
 }
