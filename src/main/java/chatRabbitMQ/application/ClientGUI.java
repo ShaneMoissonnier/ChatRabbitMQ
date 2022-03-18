@@ -3,6 +3,7 @@ package chatRabbitMQ.application;
 import chatRabbitMQ.application.gui.widgets.ContentPanel;
 import chatRabbitMQ.application.gui.widgets.SideBar;
 import chatRabbitMQ.messages.ChatMessage;
+import chatRabbitMQ.messages.ChatMessageType;
 import chatRabbitMQ.messages.Message;
 import chatRabbitMQ.messages.SystemMessage;
 import com.rabbitmq.client.Delivery;
@@ -93,6 +94,7 @@ public class ClientGUI extends ChatClientAbstract {
         this.clients.put(messageUuid, username);
         this.sendPresenceNotification(messageUuid);
         SideBar.addClientToList(this.clients);
+        ContentPanel.addMessage(new ChatMessage(null, "Application", username + " joined the chat", ChatMessageType.APPLICATION));
     }
 
     protected void onLogout(SystemMessage message) {
@@ -111,6 +113,7 @@ public class ClientGUI extends ChatClientAbstract {
 
         this.clients.remove(messageUuid);
         SideBar.removeClientFromList(username);
+        ContentPanel.addMessage(new ChatMessage(null, "Application", username + " left the chat", ChatMessageType.APPLICATION));
     }
 
     public boolean isLoggedIn() {
