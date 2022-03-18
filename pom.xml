@@ -50,7 +50,86 @@
     </dependencies>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <username>user</username>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>launch-relay</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>chatRabbitMQ.relayConfig.RelayConfig</mainClass>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>java.util.logging.SimpleFormatter.format</key>
+                                    <value>%4$s: %5$s%n</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>fromTerminal</key>
+                                    <value>1</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>launch-client</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>chatRabbitMQ.application.Application</mainClass>
+                            <arguments>
+                                <argument>" "</argument>
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>java.util.logging.SimpleFormatter.format</key>
+                                    <value>%4$s: %5$s%n</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>fromTerminal</key>
+                                    <value>1</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>launch-client-console</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>chatRabbitMQ.application.Application</mainClass>
+                            <arguments>
+                                <argument>${username}</argument>
+                                <argument>-console</argument>
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>java.util.logging.SimpleFormatter.format</key>
+                                    <value>%4$s: %5$s%n</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>fromTerminal</key>
+                                    <value>1</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

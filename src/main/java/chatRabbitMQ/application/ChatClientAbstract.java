@@ -39,7 +39,7 @@ public abstract class ChatClientAbstract extends Client {
     }
 
     public void leaveChat() throws IOException {
-        logger.info("You left the chat");
+        this.logShutdown("You left the chat");
         this.sendSystemMessage(SystemMessageType.LOGOUT);
         this.clients.clear();
     }

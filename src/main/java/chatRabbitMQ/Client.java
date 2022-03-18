@@ -39,6 +39,25 @@ public abstract class Client {
     }
 
     /**
+     * This method is used to log during the shutdown hook.
+     *
+     * It is necessary to bypass the logger during shutdown because I did not manage to change the LogManager class
+     * when running with Maven : the system property is always set too late. Because of this, if we want to log something
+     * during shutdown when running with Maven, we have to use System.out instead
+     *
+     * @param msg The message to log
+     */
+    protected void logShutdown(String msg) {
+        if (System.getProperty("fromTerminal") == null) {
+            /* We are executing from the IDE */
+            logger.info(msg);
+        } else {
+            /* We are executing from the terminal */
+            System.out.println("INFOS : " + msg);
+        }
+    }
+
+    /**
      * This method exists to be overridden. It is used to allow the client to do something before connecting to the
      * server.
      */
@@ -84,10 +103,10 @@ public abstract class Client {
      * Disconnects from the RabbitMQ Server.
      */
     private void disconnect() throws IOException, TimeoutException {
-        logger.info("Disconnecting from RabbitMQ-Server...");
+        this.logShutdown("Disconnecting from RabbitMQ-Server...");
         this.channel.close();
         this.connection.close();
-        logger.info("Disconnection successful");
+        this.logShutdown("Disconnection successful");
     }
 
     /**
