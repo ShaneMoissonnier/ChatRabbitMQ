@@ -3,6 +3,7 @@ package chatRabbitMQ;
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 

@@ -28,15 +28,15 @@ public class ClientConsole extends ChatClientAbstract {
                     logger.info(message.getUsername() + " joined the chat");
                     logger.info("clients online : " + this.clients);
                 }
-                this.clients.add(message.getUsername());
-                this.sendPresenceNotification(message.getUsername());
+                this.clients.put(message.getUuid(), message.getUsername());
+                this.sendPresenceNotification(message.getUuid());
             }
             case LOGOUT -> {
                 if (!message.getUsername().equals(this.getClientName())) {
                     logger.info(message.getUsername() + " left the chat");
                     logger.info("clients online : " + this.clients);
                 }
-                this.clients.remove(message.getUsername());
+                this.clients.remove(message.getUuid());
             }
         }
     }
@@ -63,7 +63,7 @@ public class ClientConsole extends ChatClientAbstract {
             }
 
             if (!msg.isBlank() && !msg.isEmpty()) {
-                message = new ChatMessage(this.getClientName(), msg);
+                message = new ChatMessage(this.getUuid(), this.getClientName(), msg);
                 channel.basicPublish(EXCHANGE_MESSAGES_NAME, "", null, message.toBytes());
             }
         }

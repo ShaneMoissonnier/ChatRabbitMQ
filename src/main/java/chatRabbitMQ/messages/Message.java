@@ -1,6 +1,7 @@
 package chatRabbitMQ.messages;
 
 import java.io.*;
+import java.util.UUID;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -17,13 +18,18 @@ public class Message implements Serializable {
      */
     private final String username;
 
-    public Message(String username) {
+    private final UUID uuid;
+
+    public Message(String username, UUID uuid) {
         this.username = username;
+        this.uuid = uuid;
     }
 
     public String getUsername() {
         return username;
     }
+
+    public UUID getUuid() { return this.uuid; }
 
     /**
      * Converts the message to a byte array.

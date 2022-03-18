@@ -7,6 +7,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 public class ConnectionButtons extends JPanel implements ActionListener {
     private final ClientGUI client;
@@ -52,21 +54,29 @@ public class ConnectionButtons extends JPanel implements ActionListener {
     }
 
     public void login() {
-        /*try {
+        try {
             String nickname = JOptionPane.showInputDialog("Choisir un pseudo : ");
 
             if (nickname == null || nickname.isEmpty())
                 return;
 
-            client.setName(nickname);
-            client.login();
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        }*/
+            client.connect(nickname);
+            setLoggedIn();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void logout()
-    {
+    public void logout() {
+        try {
+            client.leaveChat();
+            setLoggedOut();
+            ContentPanel.onDisconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

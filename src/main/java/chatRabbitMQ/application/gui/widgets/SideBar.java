@@ -5,6 +5,10 @@ import chatRabbitMQ.application.ClientGUI;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class SideBar extends JPanel {
     private static DefaultListModel<String> model;
@@ -41,21 +45,23 @@ public class SideBar extends JPanel {
         return label;
     }
 
-    /*public static void onSelfLogin(List<ClientInfo> clients) throws RemoteException {
-        for (ClientInfo client : clients) {
-            model.addElement(client.getName());
+    public static void addClientToList(Map<UUID, String> clients) {
+        Set<UUID> clientsUuid = clients.keySet();
+        model.clear();
+        for (UUID clientUuid : clientsUuid) {
+            String username = clients.get(clientUuid);
+            model.addElement(username);
         }
     }
 
-    public static void onOtherLogin(ClientInfo other) throws RemoteException {
-        model.addElement(other.getName());
-    }
-
-    public static void onSelfLogout() {
+    public static void onDisconnect() {
         model.removeAllElements();
     }
 
-    public static void onOtherLogout(ClientInfo other) throws RemoteException {
-        model.removeElement(other.getName());
-    }*/
+    public static void removeClientFromList(String client) {
+        if ( ! model.contains(client))
+            return;
+
+        model.removeElement(client);
+    }
 }

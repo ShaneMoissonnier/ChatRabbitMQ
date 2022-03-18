@@ -1,5 +1,7 @@
 package chatRabbitMQ.messages;
 
+import java.util.UUID;
+
 /**
  * A system message is anything that is not a {@link ChatMessage}, i.e. a message to notify that someone joined or left
  * the chat.
@@ -9,8 +11,8 @@ package chatRabbitMQ.messages;
 public class SystemMessage extends Message {
     private final SystemMessageType type;
 
-    public SystemMessage(SystemMessageType type, String username) {
-        super(username);
+    public SystemMessage(UUID uuid, SystemMessageType type, String username) {
+        super(username, uuid);
         this.type = type;
     }
 

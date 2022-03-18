@@ -151,7 +151,7 @@ class Server extends Client {
         try {
             switch (message.getType()) {
                 case LOGIN -> {
-                    String target = message.getUsername();
+                    String  target = message.getUuid().toString();
                     logger.info("User '" + target + "' logged in. Sending history...");
 
                     byte[] data = SerializationUtils.serialize(this.messageList);

@@ -9,33 +9,34 @@ import com.rabbitmq.client.Delivery;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ChatClientAbstract extends Client {
+    private UUID uuid;
     private String clientName;
-    protected final Set<String> clients;
+    protected final Map<UUID, String> clients;
 
     public ChatClientAbstract() {
         super();
-        clients = new HashSet<>();
+        clients = new HashMap<>();
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
     protected void subscribeToQueues() throws IOException {
         super.subscribeToQueues();
-        this.subscribeToQueue(EXCHANGE_NOTIFY_PRESENCE, this::notifyPresenceCallbackInit, this.getClientName());
-        this.subscribeToQueue(EXCHANGE_HISTORY, this::historyCallback, this.getClientName());
+        this.subscribeToQueue(EXCHANGE_NOTIFY_PRESENCE, this::notifyPresenceCallbackInit, this.uuid.toString());
+        this.subscribeToQueue(EXCHANGE_HISTORY, this::historyCallback, this.uuid.toString());
     }
 
     public void joinChat() throws IOException {
-        this.clients.add(this.getClientName());
+        this.clients.put(this.getUuid(), this.getClientName());
         this.sendSystemMessage(SystemMessageType.LOGIN);
-        logger.info(this.getClientName() + " joined the chat");
+        logger.info("You joined the chat");
     }
 
     public void leaveChat() throws IOException {
+        logger.info("You left the chat");
         this.sendSystemMessage(SystemMessageType.LOGOUT);
         this.clients.clear();
     }
@@ -46,8 +47,9 @@ public abstract class ChatClientAbstract extends Client {
     }
 
     protected void notifyPresenceCallbackInit(String ignored, Delivery delivery) {
+        //System.out.println(delivery.getEnvelope().getRoutingKey());
         Message m = Message.fromBytes(delivery.getBody());
-        this.clients.add(m.getUsername());
+        this.clients.put(m.getUuid(), m.getUsername());
         logger.info("Received a presence notification from " + m.getUsername() + ", clients online : " + this.clients);
     }
 
@@ -57,24 +59,32 @@ public abstract class ChatClientAbstract extends Client {
         for (ChatMessage message : messageList) {
             /* The main reason we log instead of printing here is to make sure the output streams stay synchronized,
              * meaning that the "end of the message history" log happens after the history is actually printed */
-            logger.info("   " + message.getUsername() + " : " + message.getMessage());
+            logger.info(message.toString());
         }
         logger.info("End of the message history");
     }
 
     public void sendSystemMessage(SystemMessageType type) throws IOException {
-        SystemMessage message = new SystemMessage(type, this.clientName);
+        System.out.println(this.getClientName()+ " " + this.getUuid());
+        SystemMessage message = new SystemMessage(this.getUuid(), type, this.clientName);
         channel.basicPublish(EXCHANGE_SYSTEM_NAME, "", null, message.toBytes());
     }
 
-    public void sendPresenceNotification(String target) {
-        Message message = new Message(this.getClientName());
+    public void sendMessage(String msg) throws IOException {
+        ChatMessage message = new ChatMessage(this.getUuid(), this.getClientName(), msg);
+        channel.basicPublish(EXCHANGE_MESSAGES_NAME, "", null, message.toBytes());
+    }
+
+    public void sendPresenceNotification(UUID uuid) {
+        Message message = new Message(this.getClientName(), this.uuid);
         try {
-            channel.basicPublish(EXCHANGE_NOTIFY_PRESENCE, target, null, message.toBytes());
+            channel.basicPublish(EXCHANGE_NOTIFY_PRESENCE, uuid.toString(), null, message.toBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    public UUID getUuid() { return this.uuid; }
 
     public String getClientName() {
         return this.clientName;

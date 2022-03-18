@@ -1,11 +1,13 @@
 package chatRabbitMQ.application.gui.widgets;
 
 import chatRabbitMQ.application.ClientGUI;
+import chatRabbitMQ.messages.ChatMessage;
+import chatRabbitMQ.messages.ChatMessageType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.rmi.RemoteException;
+import java.io.IOException;
 
 public class SendMessageBar extends JPanel{
     private final JTextField m_sendBar;
@@ -32,26 +34,25 @@ public class SendMessageBar extends JPanel{
             public void actionPerformed(ActionEvent event) {
                 try {
                     sendMessage(client);
-                } catch (RemoteException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
     }
 
-    public void sendMessage(ClientGUI client) throws RemoteException
-    {
-        /*if ( ! client.isLoggedIn()) {
-            ContentPanel.addMessage(new Message("Connectez vous pour envoyer un message !", "Application", Message.MessageType.APPLICATION));
+    public void sendMessage(ClientGUI client) throws IOException {
+        if ( ! client.isLoggedIn()) {
+            ContentPanel.addMessage(new ChatMessage(null,"Application", "Connectez vous pour envoyer un message !", ChatMessageType.APPLICATION));
             return;
         }
+        String message = getSendBarText();
 
-        if (getSendBarText().isEmpty())
+        if (message.isEmpty())
             return;
 
-        Message message = new Message(getSendBarText(), client.getName());
         client.sendMessage(message);
-        clearText();*/
+        clearText();
     }
 
     public Action getTextFieldEnterAction() {
