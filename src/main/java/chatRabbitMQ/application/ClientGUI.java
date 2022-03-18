@@ -44,10 +44,12 @@ public class ClientGUI extends ChatClientAbstract {
 
     @Override
     protected void historyCallback(String s, Delivery delivery) {
+        ContentPanel.addMessage(new ChatMessage(null, "Application", "Beginning of the message history", ChatMessageType.APPLICATION));
         List<ChatMessage> messageList = SerializationUtils.deserialize(delivery.getBody());
         for (ChatMessage message : messageList) {
             ContentPanel.addMessage(message);
         }
+        ContentPanel.addMessage(new ChatMessage(null, "Application", "End of the message history", ChatMessageType.APPLICATION));
     }
 
     protected void notifyPresenceCallback(String ignored, Delivery delivery) {
