@@ -43,17 +43,17 @@ public class RelayConfig extends Client {
     }
 
     private void deleteExchanges() throws IOException {
-        logger.info("Deleting exchanges...");
+        this.logShutdown("Deleting exchanges...");
         this.channel.exchangeDelete(EXCHANGE_MESSAGES_NAME);
-        logger.info("   - '" + EXCHANGE_MESSAGES_NAME + "' exchange deleted");
+        this.logShutdown("   - '" + EXCHANGE_MESSAGES_NAME + "' exchange deleted");
         this.channel.exchangeDelete(EXCHANGE_SYSTEM_NAME);
-        logger.info("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange deleted");
+        this.logShutdown("   - '" + EXCHANGE_SYSTEM_NAME + "' exchange deleted");
         this.channel.exchangeDelete(EXCHANGE_NOTIFY_PRESENCE);
-        logger.info("   - '" + EXCHANGE_NOTIFY_PRESENCE + "' exchange deleted");
+        this.logShutdown("   - '" + EXCHANGE_NOTIFY_PRESENCE + "' exchange deleted");
         this.channel.exchangeDelete(EXCHANGE_HISTORY);
-        logger.info("   - '" + EXCHANGE_HISTORY + "' exchange deleted");
-        logger.info("Exchanges deletion done");
-        logger.info("Successfully cleaned up RabbitMQ-Server !");
+        this.logShutdown("   - '" + EXCHANGE_HISTORY + "' exchange deleted");
+        this.logShutdown("Exchanges deletion done");
+        this.logShutdown("Successfully cleaned up RabbitMQ-Server !");
     }
 
     /**
@@ -97,14 +97,14 @@ public class RelayConfig extends Client {
      * Saves the message history to the disk.
      */
     private void saveHistory() throws IOException {
-        logger.info("Saving message history...");
+        this.logShutdown("Saving message history...");
         File historyFile = new File(HISTORY_PATH);
 
         if (historyFile.getParentFile().mkdirs()) {
-            logger.info("Created folder '" + historyFile.getParentFile() + "'");
+            this.logShutdown("Created folder '" + historyFile.getParentFile() + "'");
         }
         if (historyFile.createNewFile()) {
-            logger.info("Created a new history save file");
+            this.logShutdown("Created a new history save file");
         }
         FileOutputStream oFile = new FileOutputStream(historyFile, false);
         ObjectOutputStream oOutStream = new ObjectOutputStream(oFile);
@@ -114,7 +114,7 @@ public class RelayConfig extends Client {
         oOutStream.close();
         oFile.close();
 
-        logger.info("Saved message history at '" + historyFile + "'");
+        this.logShutdown("Saved message history at '" + historyFile + "'");
     }
 
     @Override
@@ -142,7 +142,7 @@ public class RelayConfig extends Client {
 
     @Override
     protected void beforeDisconnect() throws IOException {
-        logger.info("Shutting down...");
+        this.logShutdown("Shutting down...");
         this.deleteExchanges();
     }
 
