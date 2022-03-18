@@ -25,7 +25,7 @@ public class SendMessageBar extends JPanel{
 
         this.setPreferredSize(new Dimension(getWidth(), 60));
         this.add(m_sendBar, BorderLayout.CENTER);
-        this.add(new SendButtons(this, client), BorderLayout.EAST);
+        this.add(new SendButtons(this), BorderLayout.EAST);
     }
 
     public void setupTextFieldEnterAction(ClientGUI client) {

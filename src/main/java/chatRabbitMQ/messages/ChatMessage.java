@@ -8,29 +8,24 @@ import java.util.UUID;
  * @see Message
  */
 public class ChatMessage extends Message {
-    private final UUID uuid;
     private final String message;
     private final ChatMessageType type;
 
     public ChatMessage(UUID uuid, String username, String message) {
         super(username, uuid);
         this.message = message;
-        this.uuid = uuid;
         this.type = ChatMessageType.MESSAGE;
     }
 
     public ChatMessage(UUID uuid, String username, String message, ChatMessageType type) {
         super(username, uuid);
         this.message = message;
-        this.uuid = uuid;
         this.type = type;
     }
 
     public String getMessage() {
         return message;
     }
-
-    public ChatMessageType getMessageType() { return type; }
 
     public static ChatMessage fromBytes(byte[] bytes) {
         return (ChatMessage) Message.fromBytes(bytes);

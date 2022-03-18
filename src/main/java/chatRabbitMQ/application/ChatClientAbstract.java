@@ -11,21 +11,24 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This class represents a chat client.
+ */
 public abstract class ChatClientAbstract extends Client {
-    private UUID uuid;
     private String clientName;
-    protected final Map<UUID, String> clients;
+    private final UUID uuid;
+    protected final Map<UUID, String> clients; /* A list of the currently logged-in clients, self included */
 
     public ChatClientAbstract() {
         super();
-        clients = new HashMap<>();
         this.uuid = UUID.randomUUID();
+        clients = new HashMap<>();
     }
 
     @Override
     protected void subscribeToQueues() throws IOException {
         super.subscribeToQueues();
-        this.subscribeToQueue(EXCHANGE_NOTIFY_PRESENCE, this::notifyPresenceCallbackInit, this.uuid.toString());
+        this.subscribeToQueue(EXCHANGE_NOTIFY_PRESENCE, this::notifyPresenceCallback, this.uuid.toString());
         this.subscribeToQueue(EXCHANGE_HISTORY, this::historyCallback, this.uuid.toString());
     }
 
@@ -46,13 +49,24 @@ public abstract class ChatClientAbstract extends Client {
         this.leaveChat();
     }
 
-    protected void notifyPresenceCallbackInit(String ignored, Delivery delivery) {
-        //System.out.println(delivery.getEnvelope().getRoutingKey());
+    /**
+     * This method is a callback called whenever someone notifies us of their presence.
+     *
+     * @param ignored  The consumer tag
+     * @param delivery The content of the message
+     */
+    protected void notifyPresenceCallback(String ignored, Delivery delivery) {
         Message m = Message.fromBytes(delivery.getBody());
         this.clients.put(m.getUuid(), m.getUsername());
         logger.info("Received a presence notification from " + m.getUsername() + ", clients online : " + this.clients);
     }
 
+    /**
+     * This method is a callback called whenever the relay sends us the message history.
+     *
+     * @param s        The consumer tag
+     * @param delivery The content of the message
+     */
     protected void historyCallback(String s, Delivery delivery) {
         logger.info("Receiving message history from the server...");
         List<ChatMessage> messageList = SerializationUtils.deserialize(delivery.getBody());
@@ -65,7 +79,6 @@ public abstract class ChatClientAbstract extends Client {
     }
 
     public void sendSystemMessage(SystemMessageType type) throws IOException {
-        System.out.println(this.getClientName()+ " " + this.getUuid());
         SystemMessage message = new SystemMessage(this.getUuid(), type, this.clientName);
         channel.basicPublish(EXCHANGE_SYSTEM_NAME, "", null, message.toBytes());
     }
@@ -75,6 +88,11 @@ public abstract class ChatClientAbstract extends Client {
         channel.basicPublish(EXCHANGE_MESSAGES_NAME, "", null, message.toBytes());
     }
 
+    /**
+     * This method sends a presence notification.
+     *
+     * @param uuid Target of the notification
+     */
     public void sendPresenceNotification(UUID uuid) {
         Message message = new Message(this.getClientName(), this.uuid);
         try {
@@ -84,7 +102,9 @@ public abstract class ChatClientAbstract extends Client {
         }
     }
 
-    public UUID getUuid() { return this.uuid; }
+    public UUID getUuid() {
+        return this.uuid;
+    }
 
     public String getClientName() {
         return this.clientName;

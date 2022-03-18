@@ -23,16 +23,20 @@ public class ClientGUI extends ChatClientAbstract {
     }
 
     @Override
-    protected void systemCallbackInit(String s, Delivery delivery) {
+    protected void systemCallback(String s, Delivery delivery) {
         SystemMessage message = SystemMessage.fromBytes(delivery.getBody());
         switch (message.getType()) {
-            case LOGIN -> this.onLogin(message);
-            case LOGOUT -> this.onLogout(message);
+            case LOGIN:
+                this.onLogin(message);
+                break;
+            case LOGOUT:
+                this.onLogout(message);
+                break;
         }
     }
 
     @Override
-    protected void messageCallbackInit(String s, Delivery delivery) {
+    protected void messageCallback(String s, Delivery delivery) {
         ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
         ContentPanel.addMessage(message);
     }
@@ -45,8 +49,8 @@ public class ClientGUI extends ChatClientAbstract {
         }
     }
 
-    protected void notifyPresenceCallbackInit(String ignored, Delivery delivery) {
-        if ( ! isLoggedIn())
+    protected void notifyPresenceCallback(String ignored, Delivery delivery) {
+        if (!isLoggedIn())
             return;
 
         Message message = Message.fromBytes(delivery.getBody());
@@ -65,7 +69,7 @@ public class ClientGUI extends ChatClientAbstract {
     public void connect(String username) throws IOException, TimeoutException {
         this.setClientName(username);
 
-        if ( ! initialized) {
+        if (!initialized) {
             this.run();
             this.initialized = true;
             return;
@@ -83,7 +87,7 @@ public class ClientGUI extends ChatClientAbstract {
             this.clients.clear();
         }
 
-        if ( ! loggedIn)
+        if (!loggedIn)
             return;
 
         this.clients.put(messageUuid, username);
@@ -102,7 +106,7 @@ public class ClientGUI extends ChatClientAbstract {
             this.clients.clear();
         }
 
-        if ( ! this.loggedIn)
+        if (!this.loggedIn)
             return;
 
         this.clients.remove(messageUuid);
@@ -111,5 +115,12 @@ public class ClientGUI extends ChatClientAbstract {
 
     public boolean isLoggedIn() {
         return loggedIn;
+    }
+
+    @Override
+    protected void beforeDisconnect() throws IOException {
+        if (this.isLoggedIn()) {
+            super.beforeDisconnect();
+        }
     }
 }

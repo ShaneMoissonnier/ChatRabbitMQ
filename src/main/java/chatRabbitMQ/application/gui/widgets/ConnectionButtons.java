@@ -62,9 +62,7 @@ public class ConnectionButtons extends JPanel implements ActionListener {
 
             client.connect(nickname);
             setLoggedIn();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (TimeoutException | IOException e) {
             e.printStackTrace();
         }
     }

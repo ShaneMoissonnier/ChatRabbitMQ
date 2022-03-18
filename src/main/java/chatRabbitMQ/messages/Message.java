@@ -18,6 +18,9 @@ public class Message implements Serializable {
      */
     private final String username;
 
+    /**
+     * The UUID of the client sending the message
+     */
     private final UUID uuid;
 
     public Message(String username, UUID uuid) {
@@ -29,7 +32,9 @@ public class Message implements Serializable {
         return username;
     }
 
-    public UUID getUuid() { return this.uuid; }
+    public UUID getUuid() {
+        return this.uuid;
+    }
 
     /**
      * Converts the message to a byte array.

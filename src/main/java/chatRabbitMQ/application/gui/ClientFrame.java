@@ -17,7 +17,6 @@ public class ClientFrame extends JFrame {
         super(title);
         instance = this;
 
-        //TODO: Add Flatlaf initialization
         FlatAtomOneDarkContrastIJTheme.setup();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);

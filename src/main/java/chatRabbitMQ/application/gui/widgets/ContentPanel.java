@@ -56,9 +56,7 @@ public class ContentPanel extends JPanel {
             HTMLEditorKit editorKit = (HTMLEditorKit)textArea.getEditorKit();
             editorKit.insertHTML(document, document.getLength(), message.toString() + "\n",0, 0, null);
             textArea.setCaretPosition(document.getLength());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (BadLocationException | IOException e) {
             e.printStackTrace();
         }
     }

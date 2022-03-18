@@ -10,7 +10,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
 /**
- * The main client. It represents a User using the chat to send messages
+ * The main client. It represents a User using the chat in console mode to send messages.
  */
 public class ClientConsole extends ChatClientAbstract {
     public ClientConsole(String username) throws IOException, TimeoutException {
@@ -20,29 +20,32 @@ public class ClientConsole extends ChatClientAbstract {
     }
 
     @Override
-    protected void systemCallbackInit(String consumerTag, Delivery delivery) {
+    protected void systemCallback(String consumerTag, Delivery delivery) {
         SystemMessage message = SystemMessage.fromBytes(delivery.getBody());
         switch (message.getType()) {
-            case LOGIN -> {
+            case LOGIN: {
                 if (!message.getUsername().equals(this.getClientName())) {
                     logger.info(message.getUsername() + " joined the chat");
                     logger.info("clients online : " + this.clients);
                 }
                 this.clients.put(message.getUuid(), message.getUsername());
+                /* By sending a presence notification to the client that just logged in, we let them know who's online */
                 this.sendPresenceNotification(message.getUuid());
+                break;
             }
-            case LOGOUT -> {
+            case LOGOUT: {
                 if (!message.getUsername().equals(this.getClientName())) {
                     logger.info(message.getUsername() + " left the chat");
                     logger.info("clients online : " + this.clients);
                 }
                 this.clients.remove(message.getUuid());
+                break;
             }
         }
     }
 
     @Override
-    protected void messageCallbackInit(String consumerTag, Delivery delivery) {
+    protected void messageCallback(String consumerTag, Delivery delivery) {
         ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
         System.out.println(message.getUsername() + " : " + message.getMessage());
     }
@@ -52,7 +55,6 @@ public class ClientConsole extends ChatClientAbstract {
         this.joinChat();
 
         String msg;
-        ChatMessage message;
         Scanner sc = new Scanner(System.in);
         while (true) {
             try {
@@ -63,11 +65,8 @@ public class ClientConsole extends ChatClientAbstract {
             }
 
             if (!msg.isBlank() && !msg.isEmpty()) {
-                message = new ChatMessage(this.getUuid(), this.getClientName(), msg);
-                channel.basicPublish(EXCHANGE_MESSAGES_NAME, "", null, message.toBytes());
+                this.sendMessage(msg);
             }
         }
-
-        this.leaveChat();
     }
 }

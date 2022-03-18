@@ -1,4 +1,4 @@
-package chatRabbitMQ.server;
+package chatRabbitMQ.relayConfig;
 
 import chatRabbitMQ.Client;
 import chatRabbitMQ.messages.ChatMessage;
@@ -13,15 +13,16 @@ import java.util.Vector;
 import java.util.concurrent.TimeoutException;
 
 /**
- * This class's purpose is to configure the RabbitMQ Server by declaring the necessary exchanges.
+ * This class is a special client that does not send chat messages. Its purpose is to listen and record chat messages
+ * to manage the message history.
  * <p>
- * The class is used to remove these exchanges from the server.
+ * This class also creates the exchanges on login, and deletes them on logout.
  */
-class Server extends Client {
+public class RelayConfig extends Client {
     private static final String HISTORY_PATH = System.getProperty("user.home") + "/.chatRabbitMQ/history";
     private final Vector<ChatMessage> messageList;
 
-    private Server() throws IOException, TimeoutException {
+    private RelayConfig() throws IOException, TimeoutException {
         super();
         this.messageList = new Vector<>();
         this.run();
@@ -55,6 +56,9 @@ class Server extends Client {
         logger.info("Successfully cleaned up RabbitMQ-Server !");
     }
 
+    /**
+     * Loads the message history from the disk.
+     */
     private void loadHistory() throws IOException, ClassNotFoundException {
         logger.info("Loading message history...");
         File historyFile = new File(HISTORY_PATH);
@@ -89,6 +93,9 @@ class Server extends Client {
         logger.info("Message history successfully loaded");
     }
 
+    /**
+     * Saves the message history to the disk.
+     */
     private void saveHistory() throws IOException {
         logger.info("Saving message history...");
         File historyFile = new File(HISTORY_PATH);
@@ -111,7 +118,7 @@ class Server extends Client {
     }
 
     @Override
-    protected void messageCallbackInit(String s, Delivery delivery) {
+    protected void messageCallback(String s, Delivery delivery) {
         ChatMessage message = ChatMessage.fromBytes(delivery.getBody());
         logger.info("Message received : " + message.getUsername() + " : " + message.getMessage());
         this.messageList.add(message);
@@ -119,7 +126,6 @@ class Server extends Client {
 
     @Override
     protected void beforeConnect() {
-        logger.info("Starting the server...");
         logger.info("Starting server configuration...");
         try {
             this.loadHistory();
@@ -146,20 +152,23 @@ class Server extends Client {
     }
 
     @Override
-    protected void systemCallbackInit(String s, Delivery delivery) {
+    protected void systemCallback(String s, Delivery delivery) {
         SystemMessage message = SystemMessage.fromBytes(delivery.getBody());
         try {
             switch (message.getType()) {
-                case LOGIN -> {
-                    String  target = message.getUuid().toString();
+                case LOGIN: {
+                    String target = message.getUuid().toString();
                     logger.info("User '" + target + "' logged in. Sending history...");
 
                     byte[] data = SerializationUtils.serialize(this.messageList);
                     this.channel.basicPublish(EXCHANGE_HISTORY, target, null, data);
 
                     logger.info("History sent");
+                    break;
                 }
-                case LOGOUT -> logger.info("User '" + message.getUsername() + "' logged off");
+                case LOGOUT:
+                    logger.info("User '" + message.getUsername() + "' logged off");
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -167,6 +176,6 @@ class Server extends Client {
     }
 
     public static void main(String[] args) throws IOException, TimeoutException {
-        new Server();
+        new RelayConfig();
     }
 }
